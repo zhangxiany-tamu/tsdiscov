@@ -1,0 +1,30 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+src/*.o
+src/*.so
+src/*.dll
+src/*.dylib
+.DS_Store
+*.Rproj
+
+# Documentation and development files (not for GitHub)
+CLAUDE.md
+*_SUMMARY.md
+*_SUMMARY.txt
+*_REPORT.md
+*_FIX.md
+*_COMPLETE.md
+*_ENHANCEMENTS.md
+*_ANALYSIS.md
+*_CLEANUP.md
+*_IMPLEMENTATION.txt
+install_*.R
+competing_packages/
+*.Rmd
+tests/validation/
+
+# Build artifacts
+*.tar.gz
+*.zip

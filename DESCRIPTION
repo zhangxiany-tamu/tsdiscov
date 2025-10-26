@@ -1,0 +1,34 @@
+Package: tsdiscov
+Type: Package
+Title: Time Series Feature Extraction
+Version: 0.1.0
+Date: 2025-10-24
+Authors@R: c(
+    person("Xianyang", "Zhang", email = "zhangxiany@tamu.edu", role = c("aut", "cre"))
+    )
+Description: Extracts 352 univariate features from time series data, plus 6
+    bivariate features for analyzing relationships between series. Includes
+    statistical, spectral, entropy, complexity, and nonlinear measures with
+    efficient C++ implementations. Supports automated feature selection via
+    hypothesis testing with FDR/FWER correction.
+License: MIT + file LICENSE
+URL: https://github.com/zhangxiany-tamu/tsdiscov
+BugReports: https://github.com/zhangxiany-tamu/tsdiscov/issues
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.5.0)
+Imports:
+    Rcpp (>= 1.0.0),
+    stats
+LinkingTo: Rcpp, RcppArmadillo
+ByteCompile: true
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown,
+    tseries,
+    tsdl,
+    urca
+RoxygenNote: 7.3.3
+VignetteBuilder: knitr
