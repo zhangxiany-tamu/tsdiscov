@@ -20,10 +20,21 @@ CLAUDE.md
 *_ANALYSIS.md
 *_CLEANUP.md
 *_IMPLEMENTATION.txt
+*_EXAMPLE.md
+*_OPTIMIZATION.md
+MULTIVARIATE_*.md
+REDUNDANCY_*.md
 install_*.R
 competing_packages/
 *.Rmd
 tests/validation/
+tests/test_readme_example.R
+tests/test_multivariate_classification_example.R
+tests/test_tsdl_multivariate.R
+tests/test_updated_readme.R
+tests/check_multivariate_redundancy.R
+benchmarks/
+examples/
 
 # Build artifacts
 *.tar.gz

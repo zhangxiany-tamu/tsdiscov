@@ -666,6 +666,78 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// cpp_pairwise_ccf
+List cpp_pairwise_ccf(arma::mat X, int max_lag);
+RcppExport SEXP _tsdiscov_cpp_pairwise_ccf(SEXP XSEXP, SEXP max_lagSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< int >::type max_lag(max_lagSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_pairwise_ccf(X, max_lag));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_mutual_information
+double cpp_mutual_information(NumericVector x, NumericVector y, int bins);
+RcppExport SEXP _tsdiscov_cpp_mutual_information(SEXP xSEXP, SEXP ySEXP, SEXP binsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< int >::type bins(binsSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_mutual_information(x, y, bins));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_pairwise_mi
+NumericVector cpp_pairwise_mi(arma::mat X, int bins);
+RcppExport SEXP _tsdiscov_cpp_pairwise_mi(SEXP XSEXP, SEXP binsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    Rcpp::traits::input_parameter< int >::type bins(binsSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_pairwise_mi(X, bins));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_mv_shannon_entropy
+double cpp_mv_shannon_entropy(NumericVector x, int bins);
+RcppExport SEXP _tsdiscov_cpp_mv_shannon_entropy(SEXP xSEXP, SEXP binsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type bins(binsSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_mv_shannon_entropy(x, bins));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_cross_spectral_density
+List cpp_cross_spectral_density(NumericVector x, NumericVector y);
+RcppExport SEXP _tsdiscov_cpp_cross_spectral_density(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_cross_spectral_density(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cpp_series_statistics
+List cpp_series_statistics(arma::mat X);
+RcppExport SEXP _tsdiscov_cpp_series_statistics(SEXP XSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type X(XSEXP);
+    rcpp_result_gen = Rcpp::wrap(cpp_series_statistics(X));
+    return rcpp_result_gen;
+END_RCPP
+}
 // cpp_pacf
 NumericVector cpp_pacf(NumericVector x, int max_lag);
 RcppExport SEXP _tsdiscov_cpp_pacf(SEXP xSEXP, SEXP max_lagSEXP) {
@@ -1368,6 +1440,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_tsdiscov_cpp_zero_proportion", (DL_FUNC) &_tsdiscov_cpp_zero_proportion, 2},
     {"_tsdiscov_cpp_std1st_der", (DL_FUNC) &_tsdiscov_cpp_std1st_der, 1},
     {"_tsdiscov_cpp_motif_three_quantile", (DL_FUNC) &_tsdiscov_cpp_motif_three_quantile, 1},
+    {"_tsdiscov_cpp_pairwise_ccf", (DL_FUNC) &_tsdiscov_cpp_pairwise_ccf, 2},
+    {"_tsdiscov_cpp_mutual_information", (DL_FUNC) &_tsdiscov_cpp_mutual_information, 3},
+    {"_tsdiscov_cpp_pairwise_mi", (DL_FUNC) &_tsdiscov_cpp_pairwise_mi, 2},
+    {"_tsdiscov_cpp_mv_shannon_entropy", (DL_FUNC) &_tsdiscov_cpp_mv_shannon_entropy, 2},
+    {"_tsdiscov_cpp_cross_spectral_density", (DL_FUNC) &_tsdiscov_cpp_cross_spectral_density, 2},
+    {"_tsdiscov_cpp_series_statistics", (DL_FUNC) &_tsdiscov_cpp_series_statistics, 1},
     {"_tsdiscov_cpp_pacf", (DL_FUNC) &_tsdiscov_cpp_pacf, 2},
     {"_tsdiscov_cpp_pacf_features", (DL_FUNC) &_tsdiscov_cpp_pacf_features, 2},
     {"_tsdiscov_cpp_matrix_profile", (DL_FUNC) &_tsdiscov_cpp_matrix_profile, 2},

@@ -29,6 +29,29 @@ y <- rnorm(200)
 ccf_features <- ts_ccf_summary(x, y)        # Cross-correlation
 coh_features <- ts_coherence_simple(x, y)   # Coherence analysis
 granger <- ts_granger_lite(x, y)            # Granger causality
+
+# Multivariate features (analyze joint behavior of multiple series)
+# Example: 4 sensor channels, 200 time points
+X <- matrix(rnorm(4 * 200), nrow = 4, ncol = 200)
+
+# Extract all 51 multivariate features
+mv_features <- ts_features_all(X, feature_type = "multivariate")
+length(mv_features)  # 51 features
+
+# Extract both univariate and multivariate features
+both_features <- ts_features_all(X,
+                                  feature_type = "both",
+                                  univariate_summary = "aggregate")
+# Returns 51 multivariate + aggregated univariate features
+
+# Batch processing: compare multiple multivariate systems
+systems <- list(
+  sensor_array_1 = matrix(rnorm(3 * 150), nrow = 3),
+  sensor_array_2 = matrix(rnorm(3 * 150), nrow = 3),
+  sensor_array_3 = matrix(rnorm(3 * 150), nrow = 3)
+)
+results <- do.call(rbind, lapply(systems, ts_features_all_df))
+rownames(results) <- names(systems)
 ```
 
 ## Examples
@@ -59,6 +82,48 @@ cat("Selected", result$n_features_selected, "out of", result$n_features_original
 # Use selected features for classification
 library(randomForest)
 model <- randomForest(result$X_selected, as.factor(y))
+```
+
+### Multivariate Time Series Classification
+
+Classify systems with varying numbers of sensors:
+
+```r
+library(randomForest)
+set.seed(42)
+
+# Generate systems with 3-8 sensors each (40 per class)
+systems <- list()
+labels <- c()
+
+# Class 0: Independent sensors
+for (i in 1:40) {
+  N <- sample(3:8, 1)
+  systems[[i]] <- matrix(rnorm(N * 150), nrow = N)
+  labels[i] <- 0
+}
+
+# Class 1: Synchronized sensors
+for (i in 41:80) {
+  N <- sample(3:8, 1)
+  t <- seq(0, 10, length.out = 150)
+  common <- sin(2*pi*t)
+  X <- matrix(0, nrow = N, ncol = 150)
+  for (j in 1:N) X[j,] <- common + rnorm(150, sd = 0.2)
+  systems[[i]] <- X
+  labels[i] <- 1
+}
+
+# Extract features (51 features regardless of N)
+features <- do.call(rbind, lapply(systems, ts_features_all_df))
+features <- features[, colSums(is.na(features)) == 0]
+
+# Train and evaluate
+train_idx <- c(1:30, 41:70)
+test_idx <- c(31:40, 71:80)
+model <- randomForest(features[train_idx, ], as.factor(labels[train_idx]))
+pred <- predict(model, features[test_idx, ])
+mean(pred == labels[test_idx])
 ```
 
 ### Real-World Examples
@@ -144,7 +209,7 @@ The feature selection implementation includes:
 
 ## Features
 
-The package provides **352 univariate features** and **6 bivariate features** across multiple categories:
+The package provides **352 univariate features**, **6 bivariate features**, and **51 multivariate features** across multiple categories:
 
 ### Univariate Features (352)
 
@@ -179,6 +244,20 @@ The package provides **352 univariate features** and **6 bivariate features** ac
 **Coherence Analysis** (2 features): Peak coherence, mean coherence across frequencies
 
 **Granger Causality** (2 features): AIC difference, F-test p-value for predictive relationships
+
+### Multivariate Features (51)
+
+Analyze joint behavior and interactions in multivariate time series (e.g., sensor arrays, multi-channel signals):
+
+**PCA Features** (15 features): Variance explained by principal components (PC1-PC3), cumulative variance, effective rank, participation ratio, entropy, stable rank, eigenvalue metrics
+
+**Correlation Structure** (15 features): Mean/median/max/min/std correlations, correlation fractions (positive/strong/weak), spectral radius, Frobenius norm, determinant, log-determinant, condition number
+
+**Covariance Features** (6 features): Trace, determinant, log-determinant, condition number, Frobenius norm, spectral norm
+
+**Synchronization** (8 features): Cross-correlation statistics (max mean/median/std), lag statistics (mean/std), mutual information (mean/max/std)
+
+**Diversity** (7 features): Mean diversity, ACF1 diversity, complexity variance, entropy diversity, range diversity, skewness diversity, kurtosis diversity
 
 All computationally intensive operations are implemented in C++ via Rcpp for efficiency.
 
@@ -323,14 +402,87 @@ ts_features(x, features = "compengine")      # 12 CompEngine features
 ts_features(x, features = c("stats", "acf", "entropy"))  # Custom combination
 ```
 
+### Multivariate Feature Extraction
+
+For multivariate time series (multiple series measured together):
+
+```r
+# Create multivariate data (N series × T time points)
+X <- matrix(rnorm(4 * 200), nrow = 4, ncol = 200)
+
+# Extract all multivariate features (51 features)
+mv_all <- ts_features_all(X, feature_type = "multivariate")
+
+# Extract specific multivariate feature sets
+pca_feats <- ts_features_all(X,
+                              feature_type = "multivariate",
+                              multivariate_sets = "pca")          # 15 PCA features
+
+corr_feats <- ts_features_all(X,
+                               feature_type = "multivariate",
+                               multivariate_sets = "correlation")  # 15 correlation features
+
+sync_feats <- ts_features_all(X,
+                               feature_type = "multivariate",
+                               multivariate_sets = "sync")         # 8 synchronization features
+
+# Combine specific sets
+combined <- ts_features_all(X,
+                             feature_type = "multivariate",
+                             multivariate_sets = c("pca", "correlation"))  # 30 features
+
+# Extract both univariate and multivariate features
+# Option 1: Aggregate univariate features across series
+both_agg <- ts_features_all(X,
+                             feature_type = "both",
+                             univariate_summary = "aggregate")
+# Returns: 51 multivariate + aggregated univariate (mean/max/min/sd)
+
+# Option 2: Per-series univariate features
+both_per <- ts_features_all(X,
+                             feature_type = "both",
+                             univariate_summary = "per_series")
+# Returns: 51 multivariate + 352 features × 4 series = 1459 total features
+
+# Batch processing multiple multivariate systems
+systems <- list(
+  system1 = matrix(rnorm(3 * 100), nrow = 3),
+  system2 = matrix(rnorm(3 * 100), nrow = 3),
+  system3 = matrix(rnorm(3 * 100), nrow = 3)
+)
+results <- do.call(rbind, lapply(systems, ts_features_all_df))
+rownames(results) <- names(systems)
+# Results is a 3 × 51 data frame comparing the three systems
+```
+
+Available multivariate feature sets:
+- `"pca"` - PCA-based features (15 features)
+- `"correlation"` - Correlation structure (15 features)
+- `"covariance"` - Covariance matrix features (6 features)
+- `"sync"` - Synchronization and dependencies (8 features)
+- `"diversity"` - Diversity and heterogeneity (7 features)
+- `"all"` - All multivariate features (51 features)
+
 ## Performance
 
 Core computations use optimized C++ implementations. No external system dependencies required beyond standard R packages.
 
 ## Use Cases
 
+**Univariate Time Series:**
 - Time series classification and clustering
 - Feature engineering for forecasting models
+- Anomaly detection in single-channel signals
 - Exploratory time series analysis
+
+**Multivariate Time Series:**
+- Sensor array classification (e.g., fault detection with varying sensor counts)
+- Multi-channel EEG/biosignal analysis
+- Environmental monitoring with multiple stations
+- Industrial process monitoring across multiple variables
+- Network traffic analysis with multiple nodes
+
+**General:**
 - Automated feature selection for machine learning
 - Signal processing and pattern recognition
+- Classification with varying dimensionality across samples

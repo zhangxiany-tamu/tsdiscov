@@ -255,6 +255,76 @@ cpp_motif_three_quantile <- function(x) {
     .Call(`_tsdiscov_cpp_motif_three_quantile`, x)
 }
 
+#' Compute pairwise cross-correlation function (CCF) features - Rcpp version
+#'
+#' Efficiently computes CCF for all pairs of time series
+#'
+#' @param X Matrix (N x T) where rows are series, columns are timepoints
+#' @param max_lag Maximum lag for CCF
+#' @return List with ccf_max_vals, ccf_lag_vals, ccf_zero_vals for all pairs
+#' @keywords internal
+cpp_pairwise_ccf <- function(X, max_lag) {
+    .Call(`_tsdiscov_cpp_pairwise_ccf`, X, max_lag)
+}
+
+#' Compute mutual information between two vectors - Rcpp version
+#'
+#' Histogram-based estimator of mutual information
+#'
+#' @param x Numeric vector
+#' @param y Numeric vector
+#' @param bins Number of bins for histogram
+#' @return Mutual information estimate
+#' @keywords internal
+cpp_mutual_information <- function(x, y, bins = 10L) {
+    .Call(`_tsdiscov_cpp_mutual_information`, x, y, bins)
+}
+
+#' Compute pairwise mutual information - Rcpp version
+#'
+#' Efficiently computes MI for all pairs of time series
+#'
+#' @param X Matrix (N x T) where rows are series, columns are timepoints
+#' @param bins Number of bins for histogram
+#' @return Vector of mutual information values for all pairs
+#' @keywords internal
+cpp_pairwise_mi <- function(X, bins = 10L) {
+    .Call(`_tsdiscov_cpp_pairwise_mi`, X, bins)
+}
+
+#' Compute Shannon entropy from binned data - multivariate version
+#'
+#' @param x Numeric vector
+#' @param bins Number of bins
+#' @return Shannon entropy
+#' @keywords internal
+cpp_mv_shannon_entropy <- function(x, bins = 10L) {
+    .Call(`_tsdiscov_cpp_mv_shannon_entropy`, x, bins)
+}
+
+#' Compute cross-spectral density for a pair of series - Rcpp version
+#'
+#' Uses FFT to compute cross-spectral density
+#'
+#' @param x First time series
+#' @param y Second time series
+#' @return List with coherence, phase, and CSD magnitude
+#' @keywords internal
+cpp_cross_spectral_density <- function(x, y) {
+    .Call(`_tsdiscov_cpp_cross_spectral_density`, x, y)
+}
+
+#' Compute per-series statistics for diversity features - Rcpp version
+#'
+#' Efficiently computes univariate statistics for each series
+#'
+#' @param X Matrix (N x T) where rows are series
+#' @return List with means, variances, ranges, skewness, kurtosis for each series
+#' @keywords internal
+cpp_series_statistics <- function(X) {
+    .Call(`_tsdiscov_cpp_series_statistics`, X)
+}
+
 cpp_pacf <- function(x, max_lag = 20L) {
     .Call(`_tsdiscov_cpp_pacf`, x, max_lag)
 }

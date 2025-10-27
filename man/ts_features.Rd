@@ -7,7 +7,7 @@
 ts_features(x, features = "all")
 }
 \arguments{
-\item{x}{Numeric vector representing the time series}
+\item{x}{Numeric vector or ts object representing the time series}
 
 \item{features}{Character vector of feature sets to extract. Options include
 "stats", "acf", "pacf", "trend", "structure", "fft", "scaling", "stl",
