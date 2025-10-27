@@ -5,7 +5,7 @@
 #' actual variances and covariances.
 #'
 #' @param X Matrix (N x T) where N is number of series, T is timepoints
-#' @return Named list of 7 covariance-based features
+#' @return Named list of 5 covariance-based features
 #' @export
 #' @examples
 #' \dontrun{
@@ -33,40 +33,22 @@ ts_mv_covariance <- function(X) {
   # Feature 1: Trace (total variance across all series)
   cov_trace <- sum(diag(Sigma))
 
-  # Feature 2: Determinant
-  det_Sigma <- tryCatch(
-    det(Sigma),
-    error = function(e) NA
-  )
-  cov_determinant <- det_Sigma
+  # Feature 2: Log determinant (robust, using eigenvalue floor)
+  cov_log_determinant <- robust_log_det(eigenvalues, floor = 1e-10)
 
-  # Feature 3: Log determinant (generalized variance)
-  cov_log_determinant <- if(!is.na(det_Sigma) && det_Sigma > 1e-10) {
-    log(det_Sigma)
-  } else {
-    NA
-  }
+  # Feature 3: Condition number (robust, returns NA for near-singular)
+  cov_condition_number <- robust_cond_number(eigenvalues, eps = 1e-10)
 
-  # Feature 4: Condition number
-  lambda_min <- eigenvalues[N]
-  lambda_max <- eigenvalues[1]
-  cov_condition_number <- if(lambda_min > 1e-10) {
-    lambda_max / lambda_min
-  } else {
-    NA
-  }
-
-  # Feature 5: Frobenius norm
+  # Feature 4: Frobenius norm
   # ||Σ||_F = sqrt(sum(Σ^2))
   cov_frobenius_norm <- sqrt(sum(Sigma^2))
 
-  # Feature 6: Spectral norm (largest eigenvalue)
-  cov_spectral_norm <- lambda_max
+  # Feature 5: Spectral norm (largest eigenvalue)
+  cov_spectral_norm <- max(eigenvalues)
 
-  # Return named list (removed cov_nuclear_norm - always equals cov_trace)
+  # Return named list (now 5 features instead of 6)
   list(
     cov_trace = cov_trace,
-    cov_determinant = cov_determinant,
     cov_log_determinant = cov_log_determinant,
     cov_condition_number = cov_condition_number,
     cov_frobenius_norm = cov_frobenius_norm,

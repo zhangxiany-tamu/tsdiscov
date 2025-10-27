@@ -86,5 +86,40 @@ standardize_multivariate <- function(X) {
 #' @return Character vector of available feature set names
 #' @keywords internal
 get_multivariate_feature_sets <- function() {
-  c("pca", "correlation", "covariance", "sync", "diversity")
+  c("pca", "correlation", "covariance", "sync", "diversity", "total_correlation", "lag_structure", "network")
+}
+
+#' Robust log-determinant computation via eigenvalues
+#'
+#' Computes log-determinant of a positive semi-definite matrix using
+#' eigenvalues with a floor to prevent -Inf for near-singular matrices.
+#'
+#' @param eigenvalues Numeric vector of eigenvalues
+#' @param floor Minimum eigenvalue threshold (default 1e-10)
+#' @return Numeric log-determinant
+#' @keywords internal
+robust_log_det <- function(eigenvalues, floor = 1e-10) {
+  # Apply floor to prevent log(0) = -Inf
+  e <- pmax(eigenvalues, floor)
+  sum(log(e))
+}
+
+#' Robust condition number computation
+#'
+#' Computes condition number (ratio of largest to smallest eigenvalue)
+#' with appropriate handling of near-zero eigenvalues.
+#'
+#' @param eigenvalues Numeric vector of eigenvalues
+#' @param eps Threshold for considering an eigenvalue as zero (default 1e-10)
+#' @return Numeric condition number, or NA if smallest eigenvalue < eps
+#' @keywords internal
+robust_cond_number <- function(eigenvalues, eps = 1e-10) {
+  e_max <- max(eigenvalues)
+  e_min <- min(eigenvalues)
+
+  if (e_min > eps) {
+    e_max / e_min
+  } else {
+    NA_real_
+  }
 }

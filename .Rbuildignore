@@ -19,3 +19,5 @@
 ^install_.*\.R$
 ^competing_packages$
 ^tests/validation$
+^benchmarks$
+^examples$

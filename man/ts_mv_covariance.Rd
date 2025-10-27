@@ -10,7 +10,7 @@ ts_mv_covariance(X)
 \item{X}{Matrix (N x T) where N is number of series, T is timepoints}
 }
 \value{
-Named list of 7 covariance-based features
+Named list of 5 covariance-based features
 }
 \description{
 Extracts features based on the covariance matrix of the time series.

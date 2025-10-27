@@ -10,15 +10,24 @@
 #'   \itemize{
 #'     \item "all" - All available multivariate features (default)
 #'     \item "pca" - PCA-based features (15 features)
-#'     \item "correlation" - Correlation structure features (16 features)
-#'     \item "covariance" - Covariance matrix features (7 features)
-#'     \item "spectral" - Cross-spectral and coherence features (10 features)
-#'     \item "sync" - Synchronization features (10 features)
-#'     \item "diversity" - Diversity and complexity features (8 features)
+#'     \item "correlation" - Correlation structure features (15 features)
+#'     \item "covariance" - Covariance matrix features (5 features)
+#'     \item "sync" - Synchronization features (8 features)
+#'     \item "diversity" - Diversity and complexity features (7 features)
+#'     \item "total_correlation" - Information-theoretic complexity (2 features)
+#'     \item "lag_structure" - Temporal relationship patterns (4 features)
+#'     \item "network" - Graph/network topology metrics (5 features)
 #'   }
 #'   Can specify multiple sets, e.g., c("pca", "correlation")
 #' @param standardize Logical; if TRUE (default), standardizes each series to
 #'   have mean 0 and standard deviation 1 before computing features
+#' @param max_lag Integer; maximum lag for cross-correlation analysis (default 20).
+#'   Used by synchronization features. Will be capped at floor(T/4) where T is series length.
+#' @param bins Integer; number of bins for histogram-based features (default 10).
+#'   Used by synchronization (mutual information) and diversity features.
+#' @param correlation_method Character; correlation method for correlation features.
+#'   One of "pearson" (default), "spearman", or "kendall".
+#' @param ... Additional arguments (currently ignored, reserved for future use)
 #' @return Named list of multivariate features. The number of features depends
 #'   on which feature sets are requested.
 #' @export
@@ -45,18 +54,33 @@
 #' }
 ts_features_multivariate <- function(X,
                                      features = "all",
-                                     standardize = TRUE) {
+                                     standardize = TRUE,
+                                     max_lag = 20,
+                                     bins = 10,
+                                     correlation_method = "pearson",
+                                     ...) {
   # Validate and convert input to matrix format
-  X <- validate_multivariate_input(X)
+  X_raw <- validate_multivariate_input(X)
 
   # Check for missing data
-  if (anyNA(X)) {
+  if (anyNA(X_raw)) {
     stop("Missing data not supported. Please provide complete data.")
   }
 
-  # Standardize if requested
-  if (standardize) {
-    X <- standardize_multivariate(X)
+  # Compute standardized version once (always, for routing)
+  X_std <- standardize_multivariate(X_raw)
+
+  # Determine which data to use for each feature set
+  # Covariance always uses raw data (to preserve scale information)
+  # Other features use standardized data if standardize=TRUE, raw otherwise
+  X_for_others <- if (standardize) X_std else X_raw
+
+  # Warn if user requests only covariance with standardize=TRUE
+  if (standardize &&
+      length(features) == 1 &&
+      "covariance" %in% features) {
+    warning("Covariance features use raw (non-standardized) data by design, ",
+            "even when standardize=TRUE. To suppress this warning, set standardize=FALSE.")
   }
 
   # Expand "all" to all available feature sets
@@ -77,23 +101,36 @@ ts_features_multivariate <- function(X,
   result <- list()
 
   if ("pca" %in% features) {
-    result <- c(result, ts_mv_pca(X))
+    result <- c(result, ts_mv_pca(X_for_others))
   }
 
   if ("correlation" %in% features) {
-    result <- c(result, ts_mv_correlation(X))
+    result <- c(result, ts_mv_correlation(X_for_others, method = correlation_method))
   }
 
   if ("covariance" %in% features) {
-    result <- c(result, ts_mv_covariance(X))
+    # Covariance always uses raw data (scale information matters)
+    result <- c(result, ts_mv_covariance(X_raw))
   }
 
   if ("sync" %in% features) {
-    result <- c(result, ts_mv_synchronization(X))
+    result <- c(result, ts_mv_synchronization(X_for_others, max_lag = max_lag, bins = bins))
   }
 
   if ("diversity" %in% features) {
-    result <- c(result, ts_mv_diversity(X))
+    result <- c(result, ts_mv_diversity(X_for_others, bins = bins))
+  }
+
+  if ("total_correlation" %in% features) {
+    result <- c(result, ts_mv_total_correlation(X_for_others, bins = bins))
+  }
+
+  if ("lag_structure" %in% features) {
+    result <- c(result, ts_mv_lag_structure(X_for_others, max_lag = max_lag))
+  }
+
+  if ("network" %in% features) {
+    result <- c(result, ts_mv_network(X_for_others))
   }
 
   return(result)

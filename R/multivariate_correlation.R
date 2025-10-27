@@ -3,7 +3,10 @@
 #' Extracts features characterizing the correlation structure between time series.
 #'
 #' @param X Matrix (N x T) where N is number of series, T is timepoints
-#' @return Named list of 16 correlation-based features
+#' @param method Character; correlation method. One of "pearson" (default),
+#'   "spearman", or "kendall"
+#' @param ... Additional arguments (currently ignored)
+#' @return Named list of 15 correlation-based features
 #' @export
 #' @examples
 #' \dontrun{
@@ -12,12 +15,15 @@
 #' X[2,] <- 0.8 * X[1,] + 0.2 * rnorm(150)
 #' corr_features <- ts_mv_correlation(X)
 #' }
-ts_mv_correlation <- function(X) {
+ts_mv_correlation <- function(X, method = "pearson", ...) {
+  # Validate method
+  method <- match.arg(method, c("pearson", "spearman", "kendall"))
+
   N <- nrow(X)
   T_len <- ncol(X)
 
-  # Compute correlation matrix
-  R <- cor(t(X))
+  # Compute correlation matrix with specified method
+  R <- cor(t(X), method = method)
 
   # Extract off-diagonal elements (the actual correlations between series)
   if (N >= 2) {
@@ -81,26 +87,18 @@ ts_mv_correlation <- function(X) {
   eigen_vals <- eigen(R, symmetric = TRUE, only.values = TRUE)$values
   corr_spectral_radius <- max(eigen_vals)
 
-  # Feature 13: Determinant
-  det_R <- tryCatch(
-    det(R),
-    error = function(e) NA
-  )
-  corr_determinant <- det_R
+  # Feature 13: Log determinant (robust, using eigenvalue floor)
+  corr_log_determinant <- robust_log_det(eigen_vals, floor = 1e-10)
 
-  # Feature 14: Log determinant (generalized variance)
-  corr_log_determinant <- if(!is.na(det_R) && det_R > 1e-10) {
-    log(det_R)
-  } else {
-    NA
-  }
+  # Feature 14: Condition number (robust, returns NA for near-singular)
+  corr_condition_number <- robust_cond_number(eigen_vals, eps = 1e-10)
 
   # Feature 15: Frobenius norm of (R - I)
   # ||R - I||_F = sqrt(sum((R - I)^2))
   R_centered <- R - diag(N)
   corr_frobenius_norm <- sqrt(sum(R_centered^2))
 
-  # Return named list (removed corr_trace - always equals N)
+  # Return named list
   list(
     corr_mean = corr_mean,
     corr_median = corr_median,
@@ -114,8 +112,8 @@ ts_mv_correlation <- function(X) {
     corr_strong_frac = corr_strong_frac,
     corr_weak_frac = corr_weak_frac,
     corr_spectral_radius = corr_spectral_radius,
-    corr_determinant = corr_determinant,
     corr_log_determinant = corr_log_determinant,
+    corr_condition_number = corr_condition_number,
     corr_frobenius_norm = corr_frobenius_norm
   )
 }

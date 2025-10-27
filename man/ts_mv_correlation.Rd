@@ -4,13 +4,18 @@
 \alias{ts_mv_correlation}
 \title{Correlation structure features for multivariate time series}
 \usage{
-ts_mv_correlation(X)
+ts_mv_correlation(X, method = "pearson", ...)
 }
 \arguments{
 \item{X}{Matrix (N x T) where N is number of series, T is timepoints}
+
+\item{method}{Character; correlation method. One of "pearson" (default),
+"spearman", or "kendall"}
+
+\item{...}{Additional arguments (currently ignored)}
 }
 \value{
-Named list of 16 correlation-based features
+Named list of 15 correlation-based features
 }
 \description{
 Extracts features characterizing the correlation structure between time series.

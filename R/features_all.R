@@ -22,7 +22,7 @@
 #'   }
 #' @param multivariate_sets Character vector of multivariate feature sets
 #'   (default "all"). Options: "all", "pca", "correlation", "covariance",
-#'   "sync", "spectral", "diversity", or combinations
+#'   "sync", "diversity", "total_correlation", "lag_structure", "network", or combinations
 #' @param standardize Logical; standardize multivariate series (default TRUE)
 #' @param ... Additional arguments passed to feature extraction functions
 #' @return Named list of features. Length depends on feature_type and input.
@@ -37,16 +37,16 @@
 #' # Multivariate: multiple time series
 #' X <- matrix(rnorm(5 * 200), nrow = 5, ncol = 200)
 #' features <- ts_features_all(X)
-#' length(features)  # 66 multivariate features
+#' length(features)  # 61 multivariate features
 #'
 #' # Both univariate and multivariate
 #' features <- ts_features_all(X, feature_type = "both",
 #'                              univariate_summary = "aggregate")
-#' length(features)  # 66 + aggregated univariate
+#' length(features)  # 61 + aggregated univariate
 #'
-#' # Only multivariate sync and spectral features
+#' # Only multivariate sync features
 #' features <- ts_features_all(X, feature_type = "multivariate",
-#'                              multivariate_sets = c("sync", "spectral"))
+#'                              multivariate_sets = "sync")
 #' }
 ts_features_all <- function(X,
                             feature_type = c("auto", "univariate", "multivariate", "both"),

@@ -4,6 +4,10 @@
 #' Uses magnitude-squared coherence and cross-spectral density to measure
 #' frequency-specific synchronization.
 #'
+#' Note: This function is exported for direct use but is not currently included
+#' in the default "all" feature set or accessible via ts_features_multivariate().
+#' Call this function directly: ts_mv_spectral(X).
+#'
 #' @param X Matrix (N x T) where N is number of series, T is timepoints
 #' @return Named list of 10 cross-spectral features
 #' @export

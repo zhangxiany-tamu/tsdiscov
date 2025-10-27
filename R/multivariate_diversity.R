@@ -4,7 +4,9 @@
 #' multivariate system. Includes entropy-based measures and heterogeneity metrics.
 #'
 #' @param X Matrix (N x T) where N is number of series, T is timepoints
-#' @return Named list of 8 diversity/complexity features
+#' @param bins Integer; number of bins for Shannon entropy computation (default 10)
+#' @param ... Additional arguments (currently ignored)
+#' @return Named list of 7 diversity/complexity features
 #' @export
 #' @examples
 #' \dontrun{
@@ -16,7 +18,7 @@
 #' X[4,] <- cumsum(rnorm(200))  # Random walk
 #' diversity_features <- ts_mv_diversity(X)
 #' }
-ts_mv_diversity <- function(X) {
+ts_mv_diversity <- function(X, bins = 10, ...) {
   N <- nrow(X)
   T_len <- ncol(X)
 
@@ -52,11 +54,11 @@ ts_mv_diversity <- function(X) {
     }
   }
 
-  # Shannon entropy for each series using Rcpp
+  # Shannon entropy for each series using Rcpp (using provided bins parameter)
   entropy_vals <- numeric(N)
   for (i in 1:N) {
     entropy_vals[i] <- tryCatch({
-      cpp_mv_shannon_entropy(X[i,], bins = 10)
+      cpp_mv_shannon_entropy(X[i,], bins = bins)
     }, error = function(e) NA)
   }
 

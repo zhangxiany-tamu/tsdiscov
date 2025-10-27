@@ -34,15 +34,15 @@ granger <- ts_granger_lite(x, y)            # Granger causality
 # Example: 4 sensor channels, 200 time points
 X <- matrix(rnorm(4 * 200), nrow = 4, ncol = 200)
 
-# Extract all 51 multivariate features
+# Extract all 61 multivariate features
 mv_features <- ts_features_all(X, feature_type = "multivariate")
-length(mv_features)  # 51 features
+length(mv_features)  # 61 features
 
 # Extract both univariate and multivariate features
 both_features <- ts_features_all(X,
                                   feature_type = "both",
                                   univariate_summary = "aggregate")
-# Returns 51 multivariate + aggregated univariate features
+# Returns 61 multivariate + aggregated univariate features
 
 # Batch processing: compare multiple multivariate systems
 systems <- list(
@@ -114,7 +114,7 @@ for (i in 41:80) {
   labels[i] <- 1
 }
 
-# Extract features (51 features regardless of N)
+# Extract features (61 features regardless of N)
 features <- do.call(rbind, lapply(systems, ts_features_all_df))
 features <- features[, colSums(is.na(features)) == 0]
 
@@ -209,7 +209,7 @@ The feature selection implementation includes:
 
 ## Features
 
-The package provides **352 univariate features**, **6 bivariate features**, and **51 multivariate features** across multiple categories:
+The package provides **352 univariate features**, **6 bivariate features**, and **61 multivariate features** across multiple categories:
 
 ### Univariate Features (352)
 
@@ -245,7 +245,7 @@ The package provides **352 univariate features**, **6 bivariate features**, and 
 
 **Granger Causality** (2 features): AIC difference, F-test p-value for predictive relationships
 
-### Multivariate Features (51)
+### Multivariate Features (61)
 
 Analyze joint behavior and interactions in multivariate time series (e.g., sensor arrays, multi-channel signals):
 
@@ -253,7 +253,7 @@ Analyze joint behavior and interactions in multivariate time series (e.g., senso
 
 **Correlation Structure** (15 features): Mean/median/max/min/std correlations, correlation fractions (positive/strong/weak), spectral radius, Frobenius norm, determinant, log-determinant, condition number
 
-**Covariance Features** (6 features): Trace, determinant, log-determinant, condition number, Frobenius norm, spectral norm
+**Covariance Features** (5 features): Trace, log-determinant, condition number, Frobenius norm, spectral norm
 
 **Synchronization** (8 features): Cross-correlation statistics (max mean/median/std), lag statistics (mean/std), mutual information (mean/max/std)
 
@@ -394,8 +394,8 @@ ts_features(x, features = "gph_d")           # 2 GPH estimator
 ts_features(x, features = "mase")            # 1 MASE error metric
 ts_features(x, features = "quantile_spread_trend") # 2 quantile spread trends
 
-# Canonical Feature Sets (research-validated)
-ts_features(x, features = "catch22")         # 20 canonical features
+# Canonical Feature Sets
+ts_features(x, features = "canonical")       # 20 canonical features
 ts_features(x, features = "compengine")      # 12 CompEngine features
 
 # Combine multiple feature sets
@@ -410,7 +410,7 @@ For multivariate time series (multiple series measured together):
 # Create multivariate data (N series × T time points)
 X <- matrix(rnorm(4 * 200), nrow = 4, ncol = 200)
 
-# Extract all multivariate features (51 features)
+# Extract all multivariate features (61 features)
 mv_all <- ts_features_all(X, feature_type = "multivariate")
 
 # Extract specific multivariate feature sets
@@ -442,7 +442,7 @@ both_agg <- ts_features_all(X,
 both_per <- ts_features_all(X,
                              feature_type = "both",
                              univariate_summary = "per_series")
-# Returns: 51 multivariate + 352 features × 4 series = 1459 total features
+# Returns: 61 multivariate + 352 features × 4 series = 1469 total features
 
 # Batch processing multiple multivariate systems
 systems <- list(
@@ -452,7 +452,7 @@ systems <- list(
 )
 results <- do.call(rbind, lapply(systems, ts_features_all_df))
 rownames(results) <- names(systems)
-# Results is a 3 × 51 data frame comparing the three systems
+# Results is a 3 × 50 data frame comparing the three systems
 ```
 
 Available multivariate feature sets:
@@ -461,7 +461,7 @@ Available multivariate feature sets:
 - `"covariance"` - Covariance matrix features (6 features)
 - `"sync"` - Synchronization and dependencies (8 features)
 - `"diversity"` - Diversity and heterogeneity (7 features)
-- `"all"` - All multivariate features (51 features)
+- `"all"` - All multivariate features (61 features)
 
 ## Performance
 

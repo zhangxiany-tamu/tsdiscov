@@ -9,9 +9,9 @@ test_that("Covariance features work correctly", {
 
   features <- ts_mv_covariance(X)
 
-  # Check that all features are returned (removed cov_nuclear_norm - redundant with cov_trace)
+  # Check that all features are returned (removed cov_nuclear_norm and cov_determinant)
   expect_named(features, c(
-    "cov_trace", "cov_determinant", "cov_log_determinant",
+    "cov_trace", "cov_log_determinant",
     "cov_condition_number", "cov_frobenius_norm",
     "cov_spectral_norm"
   ))
@@ -43,8 +43,9 @@ test_that("Covariance features handle edge cases", {
   X[2,] <- 2  # Constant
   X[3,] <- 3  # Constant
   features <- ts_mv_covariance(X)
-  # All zeros should have determinant = 0
-  expect_true(is.na(features$cov_log_determinant) || features$cov_determinant < 1e-6)
+  # All constant should have very negative log-determinant (near-zero det)
+  expect_true(is.finite(features$cov_log_determinant))
+  expect_true(features$cov_log_determinant < -10)
 })
 
 test_that("Synchronization features work correctly", {
@@ -210,7 +211,7 @@ test_that("Phase 2 integration: all features work together", {
   div_feats <- ts_features_multivariate(X, features = "diversity")
 
   # Should have correct number of features (after redundancy removal)
-  expect_length(cov_feats, 6)   # Was 7, removed cov_nuclear_norm
+  expect_length(expect_length(expect_length(cov_feats, 5), 5), 5)   # Was 7, removed cov_nuclear_norm
   expect_length(sync_feats, 8)   # Was 10, removed ccf_sync_frac and ccf_zero_lag_mean
   expect_length(div_feats, 7)    # Was 8, removed variance_diversity
 
@@ -218,9 +219,10 @@ test_that("Phase 2 integration: all features work together", {
   all_feats <- ts_features_multivariate(X, features = "all")
 
   # Phase 1: 15 PCA + 15 correlation = 30 (removed corr_trace)
-  # Phase 2: 6 cov + 8 sync + 7 diversity = 21 (removed spectral entirely)
-  # Total: 51 features
-  expect_length(all_feats, 51)
+  # Phase 2: 5 cov + 8 sync + 7 diversity = 20 (removed spectral entirely)
+  # Phase 3: 2 total_correlation
+  # Total: 61 features
+  expect_length(expect_length(all_feats, 61), 61)
 
   # All should be numeric
   expect_true(all(sapply(all_feats, is.numeric)))
@@ -232,9 +234,9 @@ test_that("Phase 2 integration: data frame output works", {
 
   df <- ts_features_multivariate_df(X, features = "all")
 
-  # Should be 1 row, 66 columns
+  # Should be 1 row, 61 columns
   expect_equal(nrow(df), 1)
-  expect_equal(ncol(df), 51)
+  expect_equal(ncol(df), 61)
 
   # All columns should be numeric
   expect_true(all(sapply(df, is.numeric)))
@@ -252,8 +254,8 @@ test_that("Phase 2 integration: batch processing works", {
   results <- do.call(rbind, lapply(systems, ts_features_multivariate_df))
   rownames(results) <- names(systems)
 
-  # Should be 3 x 51 (after redundancy removal)
-  expect_equal(dim(results), c(3, 51))
+  # Should be 3 x 61 (after redundancy removal + total correlation)
+  expect_equal(dim(results), c(3, 61))
 
   # All should be numeric
   expect_true(all(sapply(results, is.numeric)))

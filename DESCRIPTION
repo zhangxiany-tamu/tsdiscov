@@ -6,11 +6,12 @@ Date: 2025-10-24
 Authors@R: c(
     person("Xianyang", "Zhang", email = "zhangxiany@tamu.edu", role = c("aut", "cre"))
     )
-Description: Extracts 352 univariate features from time series data, plus 6
-    bivariate features for analyzing relationships between series. Includes
-    statistical, spectral, entropy, complexity, and nonlinear measures with
-    efficient C++ implementations. Supports automated feature selection via
-    hypothesis testing with FDR/FWER correction.
+Description: Extracts 352 univariate, 6 bivariate, and 61 multivariate features from time series data.
+    Includes statistical, spectral, entropy, complexity, and nonlinear measures with
+    efficient C++ implementations. Bivariate features analyze pairwise relationships.
+    Multivariate features cover PCA, correlation, synchronization, diversity, information theory,
+    lag structure, and network topology. Supports automated feature selection via hypothesis
+    testing with FDR/FWER correction.
 License: MIT + file LICENSE
 URL: https://github.com/zhangxiany-tamu/tsdiscov
 BugReports: https://github.com/zhangxiany-tamu/tsdiscov/issues
@@ -27,6 +28,7 @@ Suggests:
     testthat (>= 3.0.0),
     knitr,
     rmarkdown,
+    randomForest,
     tseries,
     tsdl,
     urca

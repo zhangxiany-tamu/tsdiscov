@@ -181,13 +181,13 @@ NumericVector cpp_robust_trend(NumericVector x, int max_pairs = 5000) {
     bool sample = (total_pairs > max_pairs);
 
     if (sample) {
-        // Sample pairs randomly
+        // Sample pairs randomly using R's RNG
         slopes.reserve(max_pairs);
-        std::srand(123);  // Fixed seed for reproducibility
+        Rcpp::RNGScope rngScope;  // Ensure R RNG state is properly managed
 
         for (int k = 0; k < max_pairs; k++) {
-            int i = std::rand() % n;
-            int j = std::rand() % n;
+            int i = static_cast<int>(R::runif(0, n));
+            int j = static_cast<int>(R::runif(0, n));
             if (i == j) continue;
 
             if (time_idx[j] != time_idx[i]) {  // Avoid division by zero

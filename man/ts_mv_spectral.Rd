@@ -17,6 +17,11 @@ Extracts features characterizing frequency-domain relationships between series.
 Uses magnitude-squared coherence and cross-spectral density to measure
 frequency-specific synchronization.
 }
+\details{
+Note: This function is exported for direct use but is not currently included
+in the default "all" feature set or accessible via ts_features_multivariate().
+Call this function directly: ts_mv_spectral(X).
+}
 \examples{
 \dontrun{
 # Create signals with coherent low-frequency component

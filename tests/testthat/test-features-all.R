@@ -27,7 +27,7 @@ test_that("ts_features_all works with multivariate input (matrix)", {
   # Auto detection (should return multivariate)
   features <- ts_features_all(X)
   expect_true(is.list(features))
-  expect_equal(length(features), 51)  # 51 multivariate features
+  expect_equal(length(features), 61)  # 61 multivariate features
 
   # Explicit multivariate
   features2 <- ts_features_all(X, feature_type = "multivariate")
@@ -45,7 +45,7 @@ test_that("ts_features_all works with list input", {
   # Auto detection
   features <- ts_features_all(X)
   expect_true(is.list(features))
-  expect_equal(length(features), 51)
+  expect_equal(length(features), 61)
 })
 
 test_that("ts_features_all feature_type selection works", {
@@ -61,14 +61,14 @@ test_that("ts_features_all feature_type selection works", {
 
   # Multivariate only
   features_mult <- ts_features_all(X, feature_type = "multivariate")
-  expect_equal(length(features_mult), 51)
+  expect_equal(length(features_mult), 61)
   expect_true(all(!grepl("^series\\d+_", names(features_mult))))
 
   # Both
   features_both <- ts_features_all(X,
                                     feature_type = "both",
                                     univariate_summary = "aggregate")
-  expect_true(length(features_both) > 51)  # Multivariate + aggregated univariate
+  expect_true(length(features_both) > 50)  # Multivariate + aggregated univariate
   expect_true(any(grepl("_mean$", names(features_both))))  # Aggregated features
   expect_true("pca_var_pc1" %in% names(features_both))     # Multivariate features
 })
@@ -81,13 +81,13 @@ test_that("ts_features_all univariate_summary options work", {
   features_none <- ts_features_all(X,
                                     feature_type = "both",
                                     univariate_summary = "none")
-  expect_equal(length(features_none), 51)  # Only multivariate
+  expect_equal(length(features_none), 61)  # Only multivariate
 
   # Aggregate
   features_agg <- ts_features_all(X,
                                    feature_type = "both",
                                    univariate_summary = "aggregate")
-  expect_true(length(features_agg) > 51)
+  expect_true(length(features_agg) > 50)
   expect_true(any(grepl("_mean$", names(features_agg))))
   expect_true(any(grepl("_max$", names(features_agg))))
   expect_true(any(grepl("_min$", names(features_agg))))
@@ -97,7 +97,7 @@ test_that("ts_features_all univariate_summary options work", {
   features_per <- ts_features_all(X,
                                    feature_type = "both",
                                    univariate_summary = "per_series")
-  expect_true(length(features_per) > 1000)  # 51 + 3×352
+  expect_true(length(features_per) > 1000)  # 50 + 3×352
   expect_true(any(grepl("^series1_", names(features_per))))
   expect_true(any(grepl("^series2_", names(features_per))))
   expect_true(any(grepl("^series3_", names(features_per))))
@@ -143,7 +143,7 @@ test_that("ts_features_all_df returns data frame", {
   df <- ts_features_all_df(X)
   expect_true(is.data.frame(df))
   expect_equal(nrow(df), 1)
-  expect_equal(ncol(df), 51)
+  expect_equal(ncol(df), 61)
 
   # With both features
   df_both <- ts_features_all_df(X,
@@ -151,7 +151,7 @@ test_that("ts_features_all_df returns data frame", {
                                  univariate_summary = "aggregate")
   expect_true(is.data.frame(df_both))
   expect_equal(nrow(df_both), 1)
-  expect_true(ncol(df_both) > 51)
+  expect_true(ncol(df_both) > 50)
 })
 
 test_that("aggregate_univariate_features works correctly", {
@@ -184,7 +184,7 @@ test_that("ts_features_all handles edge cases", {
   # Two series (minimum for multivariate)
   X_two <- matrix(rnorm(2 * 150), nrow = 2)
   features_mv <- ts_features_all(X_two, feature_type = "multivariate")
-  expect_equal(length(features_mv), 51)
+  expect_equal(length(features_mv), 61)
 })
 
 test_that("ts_features_all produces consistent feature names", {

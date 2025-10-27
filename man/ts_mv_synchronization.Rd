@@ -4,13 +4,20 @@
 \alias{ts_mv_synchronization}
 \title{Synchronization features for multivariate time series}
 \usage{
-ts_mv_synchronization(X)
+ts_mv_synchronization(X, max_lag = 20, bins = 10, ...)
 }
 \arguments{
 \item{X}{Matrix (N x T) where N is number of series, T is timepoints}
+
+\item{max_lag}{Integer; maximum lag for CCF computation (default 20).
+Will be capped at floor(T/4) where T is the series length.}
+
+\item{bins}{Integer; number of bins for mutual information computation (default 10)}
+
+\item{...}{Additional arguments (currently ignored)}
 }
 \value{
-Named list of 10 synchronization-based features
+Named list of 8 synchronization-based features
 }
 \description{
 Extracts features characterizing time-domain synchronization between series.

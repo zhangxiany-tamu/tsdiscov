@@ -5,7 +5,11 @@
 #' how synchronized the series are.
 #'
 #' @param X Matrix (N x T) where N is number of series, T is timepoints
-#' @return Named list of 10 synchronization-based features
+#' @param max_lag Integer; maximum lag for CCF computation (default 20).
+#'   Will be capped at floor(T/4) where T is the series length.
+#' @param bins Integer; number of bins for mutual information computation (default 10)
+#' @param ... Additional arguments (currently ignored)
+#' @return Named list of 8 synchronization-based features
 #' @export
 #' @examples
 #' \dontrun{
@@ -17,7 +21,7 @@
 #' X[3,] <- sin(2*pi*t) + rnorm(200, sd=0.1)
 #' sync_features <- ts_mv_synchronization(X)
 #' }
-ts_mv_synchronization <- function(X) {
+ts_mv_synchronization <- function(X, max_lag = 20, bins = 10, ...) {
   N <- nrow(X)
   T_len <- ncol(X)
 
@@ -30,8 +34,8 @@ ts_mv_synchronization <- function(X) {
     ))
   }
 
-  # Maximum lag for CCF (use same as ts_ccf_summary)
-  max_lag <- min(20, floor(T_len / 4))
+  # Cap max_lag at floor(T/4) to ensure reasonable CCF computation
+  max_lag <- min(max_lag, floor(T_len / 4))
 
   # Compute CCF for all pairs using Rcpp (much faster)
   ccf_result <- cpp_pairwise_ccf(X, max_lag)
@@ -40,7 +44,7 @@ ts_mv_synchronization <- function(X) {
   ccf_zero_vals <- ccf_result$ccf_zero_vals
 
   # Compute mutual information for all pairs using Rcpp
-  mi_vals <- cpp_pairwise_mi(X, bins = 10)
+  mi_vals <- cpp_pairwise_mi(X, bins = bins)
 
   # Feature 1: Mean of maximum CCF
   ccf_max_mean <- mean(ccf_max_vals, na.rm = TRUE)

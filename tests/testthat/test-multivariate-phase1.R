@@ -39,11 +39,11 @@ test_that("validate_multivariate_input handles list input", {
 })
 
 test_that("validate_multivariate_input handles data frame", {
-  df <- data.frame(x1 = rnorm(50), x2 = rnorm(50), x3 = rnorm(50))
+  df <- data.frame(x1 = rnorm(100), x2 = rnorm(100), x3 = rnorm(100))
   result <- validate_multivariate_input(df)
   expect_true(is.matrix(result))
   expect_equal(nrow(result), 3)
-  expect_equal(ncol(result), 50)
+  expect_equal(ncol(result), 100)
 })
 
 test_that("validate_multivariate_input rejects invalid input", {
@@ -159,7 +159,7 @@ test_that("ts_mv_pca num_pcs thresholds are sensible", {
 test_that("ts_mv_correlation returns correct number of features", {
   result <- ts_mv_correlation(X_indep)
   expect_equal(length(result), 15)
-  expect_true(all(c("corr_mean", "corr_max", "corr_determinant") %in% names(result)))
+  expect_true(all(c("corr_mean", "corr_max", "corr_log_determinant") %in% names(result)))
 })
 
 test_that("ts_mv_correlation detects correlations", {
@@ -232,10 +232,11 @@ test_that("ts_features_multivariate extracts multiple feature sets", {
 
 test_that("ts_features_multivariate handles 'all' correctly", {
   result <- ts_features_multivariate(X_indep, features = "all")
-  # Phase 1 (31): 15 PCA + 16 correlation
-  # Phase 2 (35): 7 covariance + 10 sync + 10 spectral + 8 diversity
-  # Total: 66 features
-  expect_equal(length(result), 51)
+  # Phase 1: 15 PCA + 15 correlation
+  # Phase 2: 5 covariance + 8 sync + 7 diversity
+  # Phase 3: 2 total_correlation
+  # Total: 61 features
+  expect_equal(length(result), 61)
 })
 
 test_that("ts_features_multivariate rejects NA data", {

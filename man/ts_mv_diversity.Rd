@@ -4,13 +4,17 @@
 \alias{ts_mv_diversity}
 \title{Diversity and complexity features for multivariate time series}
 \usage{
-ts_mv_diversity(X)
+ts_mv_diversity(X, bins = 10, ...)
 }
 \arguments{
 \item{X}{Matrix (N x T) where N is number of series, T is timepoints}
+
+\item{bins}{Integer; number of bins for Shannon entropy computation (default 10)}
+
+\item{...}{Additional arguments (currently ignored)}
 }
 \value{
-Named list of 8 diversity/complexity features
+Named list of 7 diversity/complexity features
 }
 \description{
 Extracts features characterizing the diversity and complexity of the

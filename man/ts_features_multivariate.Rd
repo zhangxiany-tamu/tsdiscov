@@ -4,7 +4,15 @@
 \alias{ts_features_multivariate}
 \title{Extract features from multivariate time series}
 \usage{
-ts_features_multivariate(X, features = "all", standardize = TRUE)
+ts_features_multivariate(
+  X,
+  features = "all",
+  standardize = TRUE,
+  max_lag = 20,
+  bins = 10,
+  correlation_method = "pearson",
+  ...
+)
 }
 \arguments{
 \item{X}{Either a matrix (N x T) where N is number of series and T is timepoints,
@@ -14,16 +22,29 @@ or a list of N numeric vectors of equal length T}
 \itemize{
   \item "all" - All available multivariate features (default)
   \item "pca" - PCA-based features (15 features)
-  \item "correlation" - Correlation structure features (16 features)
-  \item "covariance" - Covariance matrix features (7 features)
-  \item "spectral" - Cross-spectral and coherence features (10 features)
-  \item "sync" - Synchronization features (10 features)
-  \item "diversity" - Diversity and complexity features (8 features)
+  \item "correlation" - Correlation structure features (15 features)
+  \item "covariance" - Covariance matrix features (5 features)
+  \item "sync" - Synchronization features (8 features)
+  \item "diversity" - Diversity and complexity features (7 features)
+  \item "total_correlation" - Information-theoretic complexity (2 features)
+  \item "lag_structure" - Temporal relationship patterns (4 features)
+  \item "network" - Graph/network topology metrics (5 features)
 }
 Can specify multiple sets, e.g., c("pca", "correlation")}
 
 \item{standardize}{Logical; if TRUE (default), standardizes each series to
 have mean 0 and standard deviation 1 before computing features}
+
+\item{max_lag}{Integer; maximum lag for cross-correlation analysis (default 20).
+Used by synchronization features. Will be capped at floor(T/4) where T is series length.}
+
+\item{bins}{Integer; number of bins for histogram-based features (default 10).
+Used by synchronization (mutual information) and diversity features.}
+
+\item{correlation_method}{Character; correlation method for correlation features.
+One of "pearson" (default), "spearman", or "kendall".}
+
+\item{...}{Additional arguments (currently ignored, reserved for future use)}
 }
 \value{
 Named list of multivariate features. The number of features depends
