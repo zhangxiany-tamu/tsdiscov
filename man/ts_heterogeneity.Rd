@@ -4,7 +4,7 @@
 \alias{ts_heterogeneity}
 \title{Extract heterogeneity features (ARCH/GARCH)}
 \usage{
-ts_heterogeneity(x, fit_garch = TRUE)
+ts_heterogeneity(x, fit_garch = FALSE)
 }
 \arguments{
 \item{x}{Numeric vector}

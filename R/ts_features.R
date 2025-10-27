@@ -773,7 +773,7 @@ ts_stl <- function(x, frequency = NULL) {
 #' @param fit_garch Logical, whether to fit GARCH model (requires tseries package)
 #' @return Named list of heterogeneity features
 #' @export
-ts_heterogeneity <- function(x, fit_garch = TRUE) {
+ts_heterogeneity <- function(x, fit_garch = FALSE) {
   n <- length(x)
 
   # Need sufficient data
@@ -817,10 +817,29 @@ ts_heterogeneity <- function(x, fit_garch = TRUE) {
     # Compute ARCH R² using R's lm() on squared series
     arch_r2_val <- tryCatch({
       whitened_demean <- whitened - mean(whitened)
-      mat <- embed(whitened_demean^2, 13)  # 12 lags + response
+      squared <- whitened_demean^2
+
+      # Check for sufficient variation (avoid degenerate cases)
+      if (sd(squared) < 1e-10 || any(!is.finite(squared))) {
+        return(NA_real_)
+      }
+
+      mat <- embed(squared, 13)  # 12 lags + response
+
+      # Need sufficient observations after embedding
+      if (nrow(mat) < 15) {
+        return(NA_real_)
+      }
+
       fit <- lm(mat[, 1] ~ mat[, -1])
       r2 <- summary(fit)$r.squared
-      if (is.nan(r2)) 1.0 else r2
+
+      # Return NA for invalid R² values
+      if (is.nan(r2) || is.na(r2) || r2 < 0 || r2 > 1) {
+        NA_real_
+      } else {
+        r2
+      }
     }, error = function(e) NA_real_)
 
     # Initialize GARCH values
@@ -842,10 +861,30 @@ ts_heterogeneity <- function(x, fit_garch = TRUE) {
           
           # Compute GARCH R²
           garch_r2_val <- tryCatch({
-            mat_g <- embed(garch_resid^2, 13)
+            garch_demean <- garch_resid - mean(garch_resid)
+            squared_g <- garch_demean^2
+
+            # Check for sufficient variation
+            if (sd(squared_g) < 1e-10 || any(!is.finite(squared_g))) {
+              return(NA_real_)
+            }
+
+            mat_g <- embed(squared_g, 13)
+
+            # Need sufficient observations
+            if (nrow(mat_g) < 15) {
+              return(NA_real_)
+            }
+
             fit_g <- lm(mat_g[, 1] ~ mat_g[, -1])
             r2_g <- summary(fit_g)$r.squared
-            if (is.nan(r2_g)) 1.0 else r2_g
+
+            # Validate R²
+            if (is.nan(r2_g) || is.na(r2_g) || r2_g < 0 || r2_g > 1) {
+              NA_real_
+            } else {
+              r2_g
+            }
           }, error = function(e) NA_real_)
         }
       }

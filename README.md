@@ -63,10 +63,10 @@ rownames(results) <- names(systems)
 set.seed(123)
 
 # Class 0: White noise (stationary, no structure)
-white_noise <- lapply(1:30, function(i) rnorm(200))
+white_noise <- lapply(1:30, function(i) ts(rnorm(200), frequency = 12))
 
 # Class 1: Random walks (non-stationary, strong trend)
-random_walks <- lapply(1:30, function(i) cumsum(rnorm(200)))
+random_walks <- lapply(1:30, function(i) ts(cumsum(rnorm(200)), frequency = 12))
 
 # Extract features
 X <- rbind(
@@ -176,10 +176,10 @@ set.seed(123)
 
 # Generate multiple time series for each class
 # Class 0: White noise (20 samples)
-class0 <- lapply(1:20, function(i) rnorm(150))
+class0 <- lapply(1:20, function(i) ts(rnorm(150), frequency = 12))
 
 # Class 1: AR process (20 samples)
-class1 <- lapply(1:20, function(i) as.numeric(arima.sim(list(ar = 0.8), 150)))
+class1 <- lapply(1:20, function(i) ts(arima.sim(list(ar = 0.8), 150), frequency = 12))
 
 # Extract features and create feature matrix
 X <- rbind(
