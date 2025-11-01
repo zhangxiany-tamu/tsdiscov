@@ -28,6 +28,5 @@ Suggests:
     testthat (>= 3.0.0),
     randomForest,
     tseries,
-    tsdl,
     urca
 RoxygenNote: 7.3.3

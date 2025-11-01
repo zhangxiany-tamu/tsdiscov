@@ -15,17 +15,15 @@ There were 3 NOTEs:
 
    This is the first submission of tsdiscov to CRAN.
 
-2. **Suggests or Enhances not in mainstream repositories: tsdl**
+2. **pandoc not installed** (local check only)
 
-   The tsdl package is suggested for optional real-world time series examples
-   in tests. It is used conditionally with `require("tsdl", quietly = TRUE)`
-   and the package works fully without it. This package provides access to the
-   Time Series Data Library for demonstration purposes only.
+   Local environment note: "Files 'README.md' or 'NEWS.md' cannot be checked
+   without 'pandoc' being installed." CRAN's check servers have pandoc installed.
 
-3. **HTML Tidy version**
+3. **HTML Tidy version** (local check only)
 
-   This is a local environment issue and does not affect the package
-   functionality. CRAN's check servers have the appropriate tools.
+   Local environment note about HTML Tidy version. CRAN's check servers have
+   the appropriate tools.
 
 ## Downstream dependencies
 
