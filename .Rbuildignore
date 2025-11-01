@@ -21,3 +21,4 @@
 ^tests/validation$
 ^benchmarks$
 ^examples$
+^cran-comments\.md$

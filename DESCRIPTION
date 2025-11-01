@@ -26,11 +26,8 @@ LinkingTo: Rcpp, RcppArmadillo
 ByteCompile: true
 Suggests:
     testthat (>= 3.0.0),
-    knitr,
-    rmarkdown,
     randomForest,
     tseries,
     tsdl,
     urca
 RoxygenNote: 7.3.3
-VignetteBuilder: knitr

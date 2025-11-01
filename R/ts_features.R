@@ -1778,7 +1778,7 @@ ts_matrix_profile <- function(x, window_size = -1) {
 #' Extract Friedrich coefficient features
 #'
 #' Computes Friedrich coefficients from Langevin model fitting.
-#' Models drift as polynomial: dx/dt = a₀ + a₁·x + a₂·x² + a₃·x³.
+#' Models drift as polynomial: dx/dt = a0 + a1*x + a2*x^2 + a3*x^3.
 #'
 #' These coefficients capture deterministic dynamics in noisy time series.
 #' Used in physics, climate science, and neuroscience for detecting
@@ -1786,7 +1786,7 @@ ts_matrix_profile <- function(x, window_size = -1) {
 #'
 #' @param x Numeric vector
 #' @param max_order Maximum polynomial order (default: 3)
-#' @return Named list with polynomial coefficients a₀, a₁, a₂, a₃
+#' @return Named list with polynomial coefficients a0, a1, a2, a3
 #' @export
 ts_friedrich <- function(x, max_order = 3) {
   n <- length(x)

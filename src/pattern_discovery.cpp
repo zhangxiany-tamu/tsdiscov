@@ -215,7 +215,7 @@ List cpp_friedrich_coefficients(NumericVector x, int max_order = 3) {
         x_mid[i] = x_clean[i];  // Use x[t] as predictor
     }
 
-    // Fit polynomial: drift ~ a₀ + a₁·x + a₂·x² + ... + aₚ·xᵖ
+    // Fit polynomial: drift ~ a0 + a1*x + a2*x^2 + ... + ap*x^p
     // Using least squares regression
 
     int n_obs = n - 1;
